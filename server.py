@@ -79,9 +79,15 @@ class Server(object):
         :return: str
         """
 
-        # TODO: YOUR CODE HERE
-
-        pass
+        if room_number == 0:
+            room_desc = "The main corridor. A vast foyer with a beautiful crystal chandelier. It must weigh a ton! Hmm...something eery about this place."
+        elif room_number == 1:
+            room_desc = "A gothic library.  Several thousands of books line the dusty bookshelves.  They must be centuries old. The small spider and the ornately spun web catches the corner of your eye."
+        elif room_number == 2:
+            room_desc = "A three tiered water fountain is the main feature in the center of this room. The natural skylight in the ceiling above creates a piercing reflection when it clashes with the white marble laid throughout the room."
+        elif room_number == 3:
+            room_desc = "A rickety old rocking chair moves back and forth as you enter the room. Is someone else here?"
+        return room_desc
 
     def greet(self):
         """
