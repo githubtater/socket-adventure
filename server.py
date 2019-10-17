@@ -78,19 +78,13 @@ class Server(object):
         :param room_number: int
         :return: str
         """
+        return [
+            "The main corridor. A vast foyer with a beautiful crystal chandelier. It must weigh a ton! Hmm...something eery about this place.",
+            "A gothic library.  Several thousands of books line the dusty bookshelves.  They must be centuries old. The small spider and the ornately spun web catches the corner of your eye.",
+            "A three tiered water fountain is the main feature in the center of this room. The natural skylight in the ceiling above creates a piercing reflection when it clashes with the white marble laid throughout the room.",
+            "A rickety old rocking chair moves back and forth as you enter the room. Is someone else here?",
+        ][room_number]
 
-        if room_number == 0:
-            room_desc = "The main corridor. A vast foyer with a beautiful crystal chandelier. It must weigh a ton! Hmm...something eery about this place."
-        elif room_number == 1:
-            room_desc = "A gothic library.  Several thousands of books line the dusty bookshelves.  They must be centuries old. The small spider and the ornately spun web catches the corner of your eye."
-        elif room_number == 2:
-            room_desc = "A three tiered water fountain is the main feature in the center of this room. The natural skylight in the ceiling above creates a piercing reflection when it clashes with the white marble laid throughout the room."
-        elif room_number == 3:
-            room_desc = "A rickety old rocking chair moves back and forth as you enter the room. Is someone else here?"
-        else:
-            room_desc = "That room number isn't on the map."
-
-        return room_desc
 
     def greet(self):
         """
@@ -143,18 +137,23 @@ class Server(object):
         :param argument: str
         :return: None
         """
-        print('the move arg is: ' + str(argument))
-        if self.room == 0 and argument == 'west':
-            self.room = 1
-        if self.room == 0 and argument == 'north':
+
+        if self.room == 0 and argument.strip() == "north":
             self.room = 3
-        if self.room == 0 and argument == 'east':
+
+        if self.room == 0 and argument.strip() == "west":
+            self.room = 1
+
+        if self.room == 0 and argument.strip() == "east":
             self.room = 2
-        if self.room == 1 and argument == 'east':
+
+        if self.room == 1 and argument.strip() == "east":
             self.room = 0
-        if self.room == 2 and argument == 'west':
+
+        if self.room == 2 and argument.strip() == "west":
             self.room = 0
-        if self.room == 3 and argument == 'south':
+
+        if self.room == 3 and argument.strip() == "south":
             self.room = 0
 
         self.output_buffer = self.room_description(self.room)
@@ -204,15 +203,15 @@ class Server(object):
 
         received = self.input_buffer.split(" ")
 
-        command = received[0]
-        arguments = ' '.join(received[1:])
+        command = received.pop(0)
+        arguments = ' '.join(received)
 
 
         {
             'quit': self.quit,
             'move': self.move,
             'say': self.say,
-        }[command](arguments)
+        }[command.strip()](arguments)
 
     def push_output(self):
         """
@@ -224,7 +223,7 @@ class Server(object):
         :return: None
         """
 
-        self.client_connection.sendall(b"OK! " + self.output_buffer.encode())
+        self.client_connection.sendall(b"OK! " + self.output_buffer.encode() + b'\n')
 
     def serve(self):
         self.connect()
