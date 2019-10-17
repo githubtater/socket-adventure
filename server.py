@@ -87,6 +87,9 @@ class Server(object):
             room_desc = "A three tiered water fountain is the main feature in the center of this room. The natural skylight in the ceiling above creates a piercing reflection when it clashes with the white marble laid throughout the room."
         elif room_number == 3:
             room_desc = "A rickety old rocking chair moves back and forth as you enter the room. Is someone else here?"
+        else:
+            room_desc = "That room number isn't on the map."
+
         return room_desc
 
     def greet(self):
@@ -114,9 +117,11 @@ class Server(object):
         :return: None 
         """
 
-        # TODO: YOUR CODE HERE
+        received = b''
+        while b'\n' not in received:
+            received += self.client_connection.recv(16)
 
-        pass
+        self.input_buffer = received.decode()
 
     def move(self, argument):
         """
@@ -138,10 +143,21 @@ class Server(object):
         :param argument: str
         :return: None
         """
+        print('the move arg is: ' + str(argument))
+        if self.room == 0 and argument == 'west':
+            self.room = 1
+        if self.room == 0 and argument == 'north':
+            self.room = 3
+        if self.room == 0 and argument == 'east':
+            self.room = 2
+        if self.room == 1 and argument == 'east':
+            self.room = 0
+        if self.room == 2 and argument == 'west':
+            self.room = 0
+        if self.room == 3 and argument == 'south':
+            self.room = 0
 
-        # TODO: YOUR CODE HERE
-
-        pass
+        self.output_buffer = self.room_description(self.room)
 
     def say(self, argument):
         """
@@ -157,9 +173,7 @@ class Server(object):
         :return: None
         """
 
-        # TODO: YOUR CODE HERE
-
-        pass
+        self.output_buffer = 'You say, "{}"'.format(argument)
 
     def quit(self, argument):
         """
@@ -173,9 +187,8 @@ class Server(object):
         :return: None
         """
 
-        # TODO: YOUR CODE HERE
-
-        pass
+        self.done = True
+        self.output_buffer = "You are now leaving Realms of Venture. Goodbye!!"
 
     def route(self):
         """
@@ -189,23 +202,29 @@ class Server(object):
         :return: None
         """
 
-        # TODO: YOUR CODE HERE
+        received = self.input_buffer.split(" ")
 
-        pass
+        command = received[0]
+        arguments = ' '.join(received[1:])
+
+
+        {
+            'quit': self.quit,
+            'move': self.move,
+            'say': self.say,
+        }[command](arguments)
 
     def push_output(self):
         """
         Sends the contents of the output buffer to the client.
-        
+
         This method should prepend "OK! " to the output and append "\n" before
         sending it.
-        
-        :return: None 
+
+        :return: None
         """
 
-        # TODO: YOUR CODE HERE
-
-        pass
+        self.client_connection.sendall(b"OK! " + self.output_buffer.encode())
 
     def serve(self):
         self.connect()
